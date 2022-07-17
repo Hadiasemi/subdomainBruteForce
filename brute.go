@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"runtime"
 	"sync"
-	
 )
 
 func DNScheck(sub []string, wg *sync.WaitGroup, domain string) {
@@ -43,6 +43,16 @@ func fileReader(file string) []string {
 
 }
 
+func ChunkStringSlice(s []string, chunkSize int) [][]string {
+	chunkNum := int(math.Ceil(float64(len(s)) / float64(chunkSize)))
+	res := make([][]string, 0, chunkNum)
+	for i := 0; i < chunkNum-1; i++ {
+		res = append(res, s[i*chunkSize:(i+1)*chunkSize])
+	}
+	res = append(res, s[(chunkNum-1)*chunkSize:])
+	return res
+}
+
 func main() {
 	var wg sync.WaitGroup
 	args := os.Args[1:]
@@ -55,18 +65,23 @@ func main() {
 	domain := args[0]
 	subdomains := fileReader(file)
 
-	totalSubdomain := len(subdomains) 
-	
-	
-	totalCPU := runtime.NumCPU()
-	wg.Add(totalCPU)
+	totalSubdomain := len(subdomains)
 
-	
-	for i := 0; i < totalSubdomain; i += totalSubdomain - 1 / totalCPU {
-		end := (i+(totalSubdomain/totalCPU + 1))
-		
-		go DNScheck(subdomains[i:end], &wg, domain)
+	totalCPU := runtime.NumCPU()
+
+	wg.Add(totalCPU)
+	parallelDomainList := ChunkStringSlice(subdomains, totalSubdomain/totalCPU)
+	size := len(parallelDomainList)
+
+	for i := 0; i < size; i++ {
+
+		go DNScheck(parallelDomainList[i], &wg, domain)
 	}
+	// for i := 0; i < totalSubdomain; i += totalSubdomain - 1 / totalCPU {
+	// 	end := (i+(totalSubdomain/totalCPU + 1))
+
+	// 	go DNScheck(subdomains[i:end], &wg, domain)
+	// }
 
 	wg.Wait()
 
