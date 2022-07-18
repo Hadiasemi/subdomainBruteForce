@@ -2,14 +2,15 @@
 This code using parrallel computing power of golang to make subdomain brute forcing faster.
 
 ## Build the command:
+
 ```bash
-go build brute.go
+▶ go build brute.go
 ```
 
 ## Help:
 
 ```bash
-./brute -h
+▶ ./brute -h
 
 Usage of ./brute:
   -f string
@@ -21,7 +22,7 @@ Usage of ./brute:
 ## Run:
 
 ```bash
-./brute -f subdomainFile -u url
+▶ ./brute -f subdomainFile -u url
 ```
 
 By default using the SEC List top 500 subdomain.
