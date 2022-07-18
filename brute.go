@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"math"
 	"net"
@@ -55,15 +56,16 @@ func ChunkStringSlice(s []string, chunkSize int) [][]string {
 
 func main() {
 	var wg sync.WaitGroup
-	args := os.Args[1:]
-	if len(args) < 1 {
-		fmt.Printf("Usage: %s url", os.Args[0])
+
+	file := flag.String("f", "./deepmagic.com-prefixes-top500.txt", "subdomain file")
+	domain := flag.String("u", "", "specify the url")
+	flag.Parse()
+
+	if *domain == "" {
+		fmt.Println("specify the url: -u url")
 		os.Exit(0)
 	}
-	file := "./subdomains-top1million-110000.txt"
-	// file := "./deepmagic.com-prefixes-top500.txt"
-	domain := args[0]
-	subdomains := fileReader(file)
+	subdomains := fileReader(*file)
 
 	totalSubdomain := len(subdomains)
 
@@ -75,16 +77,9 @@ func main() {
 
 	for i := 0; i < size; i++ {
 
-		go DNScheck(parallelDomainList[i], &wg, domain)
+		go DNScheck(parallelDomainList[i], &wg, *domain)
 	}
-	// for i := 0; i < totalSubdomain; i += totalSubdomain - 1 / totalCPU {
-	// 	end := (i+(totalSubdomain/totalCPU + 1))
-
-	// 	go DNScheck(subdomains[i:end], &wg, domain)
-	// }
 
 	wg.Wait()
 
 }
-
-
