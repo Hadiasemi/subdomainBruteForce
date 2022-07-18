@@ -1,4 +1,5 @@
 # Subdomain Brute Forcing:
+This code using parrallel computing power of golang to make subdomain brute forcing faster.
 
 ## Build the command:
 ```bash
