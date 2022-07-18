@@ -15,6 +15,8 @@ This code using parrallel computing power of golang to make subdomain brute forc
 Usage of ./brute:
   -f string
         subdomain file (default "./deepmagic.com-prefixes-top500.txt")
+ -t int
+        thread (default max)
   -u string
         specify the url
 ```

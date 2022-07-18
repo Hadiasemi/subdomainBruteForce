@@ -59,6 +59,7 @@ func main() {
 
 	file := flag.String("f", "./deepmagic.com-prefixes-top500.txt", "subdomain file")
 	domain := flag.String("u", "", "specify the url")
+	thread := flag.Int("t", runtime.NumCPU(), "thread")
 	flag.Parse()
 
 	if *domain == "" {
@@ -69,10 +70,9 @@ func main() {
 
 	totalSubdomain := len(subdomains)
 
-	totalCPU := runtime.NumCPU()
 
-	wg.Add(totalCPU)
-	parallelDomainList := ChunkStringSlice(subdomains, totalSubdomain/totalCPU)
+	wg.Add(*thread)
+	parallelDomainList := ChunkStringSlice(subdomains, totalSubdomain/ *thread)
 	size := len(parallelDomainList)
 
 	for i := 0; i < size; i++ {
